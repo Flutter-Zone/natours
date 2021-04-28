@@ -5,14 +5,17 @@ dotenv.config({ path: './config.env' });
 
 const app = require('./app');
 
+console.log("the process environment", process.env);
+
 const DB = process.env.DATABASE_LOCAL
 
 mongoose.connect(DB, {
     useNewUrlParser: true,
     useCreateIndex: true,
-    useFindAndModify: false
+    useFindAndModify: false,
+    useUnifiedTopology: true
 }).then(con => {
-    console.log("the db connection: ",con.connections);
+    // console.log("the db connection: ",con.connections);
     console.log('DB connection successful!');
 }).catch( err => {
     console.log("An error occurred", err);
