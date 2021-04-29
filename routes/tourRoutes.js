@@ -15,6 +15,7 @@ router.route('/monthly-plan/:year').get(tourController.getMonthlyPlan);
 router.route('/')
     .get(tourController.getAllTours)
     .post(tourController.createTour);
+    
 router.route('/:id')
     .get(tourController.getTour)
     .patch(tourController.updateTour)
