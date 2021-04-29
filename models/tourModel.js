@@ -132,8 +132,7 @@ tourSchema.pre(/^find/, function(next){
 // AGGREGATION MIDDLEWARE
 tourSchema.pre('aggregate', function(next){
     // unshift method is to add element at the first position in an array
-    this.pipeline().unshift({ $match: { secretTour: { $ne: true } } })
-    console.log("the aggreation", this.pipeline());
+    this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
     next();
 });
 
