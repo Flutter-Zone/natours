@@ -29,6 +29,7 @@ const sendErrorDev = (err, res) => {
 
 const sendErrorProd = (err, res) => {
     if(err.isOperational){
+        console.log("Checking the message on the error", err.message)
         res.status(err.statusCode).json({
             status: err.status,
             message: err.message
@@ -47,6 +48,9 @@ const sendErrorProd = (err, res) => {
     
 }
 
+const handleJWTError = () => new AppError('Invalid token. Please log in again!', 401);
+
+const handleTokenExpiredError = () => new AppError('Your token has expired!. Please log in again', 401);
 
 module.exports = (err, req, res, next) => {
     err.statusCode = err.statusCode || 500;
@@ -56,10 +60,13 @@ module.exports = (err, req, res, next) => {
         sendErrorDev(err, res);
     }else if(process.env.NODE_ENV == 'production'){
         let error = {...err};
+        console.log("Checking the error object", err);
         if(error.kind === 'ObjectId') error = handleCastErrorDB(error);
         if(error.code === 11000) error = handleDuplicateFieldsDB(error);
         if(error._message) error = handleValidationErrorDB(error);
-        
+        if(error.name === "JsonWebTokenError") error = handleJWTError();
+        if(error.name === 'TokenExpiredError') error = handleTokenExpiredError();
+
         sendErrorProd(error, res);
     }
   }
