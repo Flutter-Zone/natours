@@ -1,6 +1,7 @@
 const User = require('./../models/userModel');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('../utils/appError');
+const factory = require('./handlerFactory');
 
 const filterObj = (obj, ...allowedFields) => {
     const newObj = {};
@@ -11,17 +12,7 @@ const filterObj = (obj, ...allowedFields) => {
     return newObj;
 }
 
-exports.getAllUsers = catchAsync(async(req, res, next) => {
-    const users = await User.find();
-    res.status(200).json({
-        status: 'success',
-        requestedaAt: req.requestTime,
-        results: users.length,
-        data: {
-            users
-        }
-    });
-});
+
 
 exports.updateMe = catchAsync(async (req, res, next) => {
     // 1. Create error if user Post password data
@@ -54,35 +45,21 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
     });
 });
 
-
-exports.getUser = (req, res) => {
-    // 500 means internal server error
-    res.status(500).json({
-        status: 'error',
-        message: 'This route is not yet implemented'
-    });
-}
-
 exports.createUser = (req, res) => {
     // 500 means internal server error
     res.status(500).json({
         status: 'error',
-        message: 'This route is not yet implemented'
+        message: 'This route is not implemented! Please use sign up instead'
     });
 }
 
-exports.deleteUser = (req, res) => {
-    // 500 means internal server error
-    res.status(500).json({
-        status: 'error',
-        message: 'This route is not yet implemented'
-    });
+exports.getMe = (req, res, next) => {
+    req.params.id = req.user.id;
+    next();
 }
 
-exports.updateUser = (req, res) => {
-    // 500 means internal server error
-    res.status(500).json({
-        status: 'error',
-        message: 'This route is not yet implemented'
-    });
-}
+exports.getAllUsers = factory.getAll(User);
+exports.getUser = factory.getOne(User);
+// Do not update passwords with this
+exports.deleteUser = factory.deleteOne(User);
+exports.updateUser = factory.updateOne(User);
