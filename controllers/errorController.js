@@ -12,7 +12,6 @@ const handleDuplicateFieldsDB = error => {
 }
 
 const handleValidationErrorDB = error =>{
-    console.log("this is called imm");
     const errors = Object.values(error.errors).map(e => e.message);
     const message = `Invalid input data. ${errors.join('. ')}`;
     return new AppError(message, 400);
@@ -29,7 +28,6 @@ const sendErrorDev = (err, res) => {
 
 const sendErrorProd = (err, res) => {
     if(err.isOperational){
-        console.log("Checking the message on the error", err.message)
         res.status(err.statusCode).json({
             status: err.status,
             message: err.message
