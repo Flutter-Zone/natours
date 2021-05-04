@@ -56,10 +56,17 @@ reviewSchema.statics.calculateAverageRatings = async function(tour){
         }
     ]);
 
-    await Tour.findByIdAndUpdate(tour, {
-        ratingsQuantity: stats[0].nRating,
-        ratingsAverage: stats[0].avgRating
-    });
+    if(stats.length > 0){
+        await Tour.findByIdAndUpdate(tour, {
+            ratingsQuantity: stats[0].nRating,
+            ratingsAverage: stats[0].avgRating
+        });
+    }else{
+        ratingsQuantity: 0;
+        ratingsAverage: 0;
+    }
+
+    
 };
 
 // note that the post middleware function does not accept the next() as an argument
@@ -68,6 +75,15 @@ reviewSchema.post('save', function(){
     // note that this.constructor points to Review
     // and this.tour points to the field on the reviewSchema
     this.constructor.calculateAverageRatings(this.tour);
+});
+
+reviewSchema.pre(/^findOneAnd/, async function(next){
+    this.r = await this.findOne();
+    next();
+});
+
+reviewSchema.post(/^findOneAnd/, async function(){
+    await this.r.constructor.calculateAverageRatings(this.r.tour);
 });
 
 const Review = mongoose.model('Review', reviewSchema);
