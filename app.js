@@ -12,7 +12,8 @@ const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
-const { restrictTo } = require('./controllers/authController');
+const viewRouter = require('./routes/viewRoutes');
+
 
 // creating an instance of the express
 const app = express();
@@ -69,21 +70,15 @@ app.use(
 
 
 
-// Test middleware
+// Test middleware : adding request time to the request object
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
   next();
 });
 
-// VIEW ROUTES
-app.get('/', (req, res) => {
-  res.status(200).render('base', {
-    tour: 'The Fores Hiker',
-    user: 'Blankson'
-  });
-});
 
 // API ROUTES
+app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
