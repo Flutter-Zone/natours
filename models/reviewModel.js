@@ -31,6 +31,9 @@ const reviewSchema = mongoose.Schema({
     toObject: { virtuals: true }
 });
 
+// preventing duplicate reviews
+reviewSchema.index({ tour: 1, user: 1}, {unique: true})
+
 // query middleware
 reviewSchema.pre(/^find/, function(next){
     this.populate({
@@ -62,8 +65,10 @@ reviewSchema.statics.calculateAverageRatings = async function(tour){
             ratingsAverage: stats[0].avgRating
         });
     }else{
-        ratingsQuantity: 0;
-        ratingsAverage: 0;
+        await Tour.findByIdAndUpdate(tour, {
+            ratingsQuantity: 0,
+            ratingsAverage: 0
+        });
     }
 
     
