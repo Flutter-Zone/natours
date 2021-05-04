@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Tour = require('./tourModel');
 
 const reviewSchema = mongoose.Schema({
     review: {
@@ -30,10 +31,8 @@ const reviewSchema = mongoose.Schema({
     toObject: { virtuals: true }
 });
 
-const Review = mongoose.model('Review', reviewSchema);
-
 // query middleware
-reviewSchema.post(/^find/, function(next){
+reviewSchema.pre(/^find/, function(next){
     this.populate({
         path: 'user',
         select: 'name photo'
@@ -41,5 +40,36 @@ reviewSchema.post(/^find/, function(next){
 
     next();
 });
+
+// creating static methods for calculating the average ratings when the review is added on a tour
+reviewSchema.statics.calculateAverageRatings = async function(tour){
+    const stats = await this.aggregate([
+        {
+            $match: {tour: tour}
+        },
+        {
+            $group: {
+                _id: '$tour',
+                nRating: { $sum: 1 },
+                avgRating: { $avg: '$rating' }
+            }
+        }
+    ]);
+
+    await Tour.findByIdAndUpdate(tour, {
+        ratingsQuantity: stats[0].nRating,
+        ratingsAverage: stats[0].avgRating
+    });
+};
+
+// note that the post middleware function does not accept the next() as an argument
+reviewSchema.post('save', function(){
+    // this points to the current review
+    // note that this.constructor points to Review
+    // and this.tour points to the field on the reviewSchema
+    this.constructor.calculateAverageRatings(this.tour);
+});
+
+const Review = mongoose.model('Review', reviewSchema);
 
 module.exports = Review;
