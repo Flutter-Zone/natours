@@ -1,4 +1,3 @@
-console.log('hello from the client side');
-
+// var mapboxgl = require('mapbox-gl/dist/mapbox-gl.js');
 const locations = JSON.parse(document.getElementById('map').dataset.locations);
-console.log(locations);
+
