@@ -83,8 +83,6 @@ exports.protect = catchAsync(async (req, res, next) => {
     // 2. Verification token
     const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
-    console.log('the decoded: ', decoded);
-
     // 3. Check if user still exists
     const user = await User.findById(decoded.id);
 
@@ -101,6 +99,37 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.user = user;
     next();
 });
+
+
+// Only for rendered pages, no errors!
+exports.isLoggedIn = catchAsync(async (req, res, next) => {
+ 
+    if(req.cookies.jwt){
+        token = req.cookies.jwt;
+
+        // verify token
+        const decoded = await promisify(jwt.verify)(req.cookies.jwt, process.env.JWT_SECRET);
+
+        // 3. Check if user still exists
+        const user = await User.findById(decoded.id);
+
+        if(!user){
+            return next();
+        }
+
+        // 4. Check if user changed password after the JWT was issued
+        if(user.changedPasswordAfter(decoded.iat)){
+            return next();
+        }
+
+        // there is a logged in user
+        res.locals.user = user;
+        return next();
+    }
+
+    next();
+});
+
 
 
 // ...roles represents the arguments that will be passed to the restrictTo function.
