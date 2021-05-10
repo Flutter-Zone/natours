@@ -8900,7 +8900,7 @@ var _mapbox = require("./mapbox");
 // to polyfill some of the features of javascript
 // dom elements
 var mapBox = document.getElementById('map');
-var loginForm = document.querySelector('.form');
+var loginForm = document.querySelector('.form--login');
 var logOutBtn = document.querySelector('.nav__el--logout'); // delegation
 
 if (mapBox) {
