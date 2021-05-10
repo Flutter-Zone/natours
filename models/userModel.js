@@ -15,7 +15,10 @@ const userSchema = new mongoose.Schema({
         lowercase: true,
         validate: [validator.isEmail, 'Please enter a valid email']
     },
-    photo: String,
+    photo: {
+        type: String,
+        default: 'default.jpg'
+    },
     password:{
         type: String,
         required: [true, 'Please enter your password'],
@@ -83,8 +86,6 @@ userSchema.methods.changedPasswordAfter = function(JWTTimestamp){
             this.passwordChangedAt.getTime() / 1000,
             10
         );
-        console.log(changeTimestamp, JWTTimestamp);
-
         return JWTTimestamp < changeTimestamp;
     }
 
@@ -95,8 +96,6 @@ userSchema.methods.createPasswordResetToken = function(){
     const resetToken = crypto.randomBytes(32).toString('hex');
 
     this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-
-    console.log(resetToken, this.passwordResetToken)
 
     this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
 
