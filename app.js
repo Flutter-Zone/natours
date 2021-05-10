@@ -30,7 +30,9 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // its better to place the helmet middleware before any other middleware
-// app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: false
+}));
 
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
@@ -57,7 +59,7 @@ app.use(cookieParser());
 app.use(mongoSanitize());
 
 // Data sanitization against XSS
-// app.use(xss());
+app.use(xss());
 
 // Prevent parameter pollution
 app.use(
@@ -75,10 +77,9 @@ app.use(
 
 
 
-// Test middleware : adding request time to the request object
+// Test middleware : adding time to the request object
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
-  console.log(req.cookies);
   next();
 });
 
