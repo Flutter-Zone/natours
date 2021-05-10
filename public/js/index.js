@@ -1,12 +1,13 @@
 import '@babel/polyfill'; // to polyfill some of the features of javascript
 import { login } from './login';
+import { logout } from './login';
 import { displayMap } from './mapbox';
 
 
 // dom elements
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('.form');
-
+const logOutBtn = document.querySelector('.nav__el--logout');
 
 
 
@@ -25,3 +26,5 @@ if(loginForm){
     login(email, password);
   }); 
 }
+
+if(logOutBtn) logOutBtn.addEventListener('click', logout); 
